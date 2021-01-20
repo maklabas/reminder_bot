@@ -92,7 +92,7 @@ async def set_name(message: types.Message):
     await Reminder.next()
 
 
-# Проблемный участок.
+# !!! ___Проблемный участок___ !!!
 @dp.message_handler(state=Reminder.comm_state)
 async def set_comm(message: types.Message, state: FSMContext):
     name = message.text  # Считываю коммент
@@ -101,19 +101,19 @@ async def set_comm(message: types.Message, state: FSMContext):
                  (name, unique_key))  # Записываю в бд
     conn.commit()
 
-    # Беру ид пользователя чтобы не выводило других пользователей
+    # Беру ид пользователя чтобы не выводило данные других пользователей
     us_id = cur.execute("SELECT id_telegram FROM my_events;").fetchone()[0]
     running = True  # Переменная для остановки цикла в случае если бот отправил сообщение с данными
 
     # Цикл проверки времени и даты. Не заканчивается, пока не выведет напоминание
     while running:
         date_now = cur.execute("SELECT date('now');").fetchone()[0]     # Текущая дата
-        time_now = datetime.now().strftime("%H:%M")     # Текащее время (часы и минуты)
+        time_now = datetime.now().strftime("%H:%M")     # Текущее время (часы и минуты)
 
         # Если в бд не находит нужную строку, то выдаёт значение None. из-за этого выдает ошибку ValueError. Я её ловлю.
         # По идее, когда время "сейчас" совпадает со временем из бд, то в переменную записывается результат и
         try:
-            check_time = cur.execute("SELECT time FROM my_events WHERE time=?;", (time_now, date_now)).fetchone()[0]
+            check_time = cur.execute("SELECT time FROM my_events WHERE time=?;", (time_now,)).fetchone()[0]
             check_date = cur.execute("SELECT date FROM my_events WHERE ;", date_now).fetchone()[0]
         except ValueError:
             pass
